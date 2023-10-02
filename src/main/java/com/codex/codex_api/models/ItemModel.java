@@ -7,35 +7,36 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tb_avatar")
-public class AvatarModel extends RepresentationModel<AvatarModel> implements Serializable {
+@Table(name = "tb_item")
+public class ItemModel extends RepresentationModel<ItemModel> implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID= 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID idAvatar;
-    private String nameAvatar;
+    private UUID idItem;
+    private String nameItem;
+    //propriedades para type:  0 - comun, 1- raro, 2 - epico
     private Integer type;
     private String description;
     private Integer value;
     private Integer resaleValue;
-    private String uriImgAvatar;
+    private String uriImgItem;
 
-    public UUID getIdAvatar() {
-        return idAvatar;
+    public UUID getIdItem() {
+        return idItem;
     }
 
-    public void setIdAvatar(UUID idAvatar) {
-        this.idAvatar = idAvatar;
+    public void setIdItem(UUID idItem) {
+        this.idItem = idItem;
     }
 
-    public String getNameAvatar() {
-        return nameAvatar;
+    public String getNameItem() {
+        return nameItem;
     }
 
-    public void setNameAvatar(String nameAvatar) {
-        this.nameAvatar = nameAvatar;
+    public void setNameItem(String nameItem) {
+        this.nameItem = nameItem;
     }
 
     public Integer getType() {
@@ -70,14 +71,11 @@ public class AvatarModel extends RepresentationModel<AvatarModel> implements Ser
         this.resaleValue = resaleValue;
     }
 
-    public String getUriImgAvatar() {
-        return uriImgAvatar;
+    public String getUriImgItem() {
+        return uriImgItem;
     }
 
-    public void setUriImgAvatar(String uriImgAvatar) {
-        this.uriImgAvatar = uriImgAvatar;
+    public void setUriImgItem(String uriImgItem) {
+        this.uriImgItem = uriImgItem;
     }
-
-
-
 }
