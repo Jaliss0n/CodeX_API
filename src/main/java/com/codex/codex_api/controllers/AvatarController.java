@@ -1,9 +1,7 @@
 package com.codex.codex_api.controllers;
 
-import com.codex.codex_api.dtos.AccessUserDto;
 import com.codex.codex_api.dtos.AvatarDto;
-import com.codex.codex_api.models.AccessUserModel;
-import com.codex.codex_api.models.AvatarModel;
+import com.codex.codex_api.models.Avatar;
 import com.codex.codex_api.repositories.AvatarRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -26,17 +24,17 @@ public class AvatarController {
     AvatarRepository avatarRepository;
 
     @PostMapping("/avatar")
-    public ResponseEntity<AvatarModel> saveAvatar(@RequestBody @Valid AvatarDto avatarDto) {
-        var avatarModel = new AvatarModel();
+    public ResponseEntity<Avatar> saveAvatar(@RequestBody @Valid AvatarDto avatarDto) {
+        var avatarModel = new Avatar();
         BeanUtils.copyProperties(avatarDto, avatarModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(avatarRepository.save(avatarModel));
     }
 
     @GetMapping("/avatar")
-    public ResponseEntity<List<AvatarModel>> getAllAvatar() {
-        List<AvatarModel> avatarModelList = avatarRepository.findAll();
+    public ResponseEntity<List<Avatar>> getAllAvatar() {
+        List<Avatar> avatarModelList = avatarRepository.findAll();
         if(!avatarModelList.isEmpty()) {
-            for(AvatarModel avatarList : avatarModelList) {
+            for(Avatar avatarList : avatarModelList) {
                 UUID id = avatarList.getIdAvatar();
                 avatarList.add(linkTo(methodOn(AvatarController.class).getOneAvatar(id)).withSelfRel());
             }
@@ -46,7 +44,7 @@ public class AvatarController {
 
     @GetMapping("/avatar/{id}")
     public ResponseEntity<Object> getOneAvatar(@PathVariable(value = "id") UUID id){
-        Optional<AvatarModel> avatarO = avatarRepository.findById(id);
+        Optional<Avatar> avatarO = avatarRepository.findById(id);
         if(avatarO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found.");
         }
@@ -57,7 +55,7 @@ public class AvatarController {
     @PutMapping("/avatar/{id}")
     public ResponseEntity<Object> updateAvatar(@PathVariable(value = "id") UUID id,
                                                   @RequestBody @Valid AvatarDto avatarDto) {
-        Optional<AvatarModel> avatarO = avatarRepository.findById(id);
+        Optional<Avatar> avatarO = avatarRepository.findById(id);
         if(avatarO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found.");
         }
@@ -68,7 +66,7 @@ public class AvatarController {
 
     @DeleteMapping("/avatar/{id}")
     public ResponseEntity<Object> deleteAvatar(@PathVariable(value = "id") UUID id) {
-        Optional<AvatarModel> avatarO = avatarRepository.findById(id);
+        Optional<Avatar> avatarO = avatarRepository.findById(id);
         if(avatarO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found.");
         }

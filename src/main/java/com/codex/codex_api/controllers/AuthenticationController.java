@@ -5,7 +5,7 @@ import com.codex.codex_api.dtos.LoginResponseRecordDto;
 import com.codex.codex_api.dtos.RegisterRecordDto;
 import com.codex.codex_api.dtos.RegisterUnityDTO;
 import com.codex.codex_api.infra.security.TokenService;
-import com.codex.codex_api.models.AccessUserModel;
+import com.codex.codex_api.models.Users;
 import com.codex.codex_api.repositories.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class AuthenticationController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        var token = tokenService.generateToken((AccessUserModel) auth.getPrincipal());
+        var token = tokenService.generateToken((Users) auth.getPrincipal());
 
         return ResponseEntity.ok(new LoginResponseRecordDto(token));
     }
@@ -44,7 +44,7 @@ public class AuthenticationController {
         if(this.repository.findByLogin(data.login()) != null) return  ResponseEntity.badRequest().build();
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        AccessUserModel newUser = new AccessUserModel(data.login(), encryptedPassword, data.role());
+        Users newUser = new Users(data.login(), encryptedPassword, data.role());
 
         this.repository.save(newUser);
         return ResponseEntity.ok().build();
@@ -55,7 +55,7 @@ public class AuthenticationController {
         if(this.repository.findByLogin(data.login()) != null) return  ResponseEntity.badRequest().build();
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        AccessUserModel newUser = new AccessUserModel(data.login(), encryptedPassword, data.role(), data.name(), data.zipCode(), data.address());
+        Users newUser = new Users(data.login(), encryptedPassword, data.role(), data.name(), data.zipCode(), data.address());
 
         this.repository.save(newUser);
         return ResponseEntity.ok().build();

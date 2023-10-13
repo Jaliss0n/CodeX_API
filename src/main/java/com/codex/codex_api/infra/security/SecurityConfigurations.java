@@ -31,7 +31,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll() //Fechar para apenas adm
                         .requestMatchers(HttpMethod.POST, "/auth/register/unity").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/access/adm").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/access/adm").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/access/adm/list").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/access/adm").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/access/adm").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/access/unity").authenticated()
@@ -39,6 +39,8 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.PUT, "/access/unity").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/avatar").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/avatar").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/my/avatar").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/my/avatar").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

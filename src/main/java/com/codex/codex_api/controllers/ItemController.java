@@ -1,7 +1,7 @@
 package com.codex.codex_api.controllers;
 
 import com.codex.codex_api.dtos.ItemDto;
-import com.codex.codex_api.models.ItemModel;
+import com.codex.codex_api.models.Item;
 import com.codex.codex_api.repositories.ItemRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -24,17 +24,17 @@ public class ItemController {
     ItemRepository itemRepository;
 
     @PostMapping("/item")
-    public ResponseEntity<ItemModel> saveItem(@RequestBody @Valid ItemDto itemDto) {
-        var itemModel = new ItemModel();
+    public ResponseEntity<Item> saveItem(@RequestBody @Valid ItemDto itemDto) {
+        var itemModel = new Item();
         BeanUtils.copyProperties(itemDto, itemModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(itemRepository.save(itemModel));
     }
 
     @GetMapping("/item")
-    public ResponseEntity<List<ItemModel>> getAllItems() {
-        List<ItemModel> itemModelList = itemRepository.findAll();
+    public ResponseEntity<List<Item>> getAllItems() {
+        List<Item> itemModelList = itemRepository.findAll();
         if(!itemModelList.isEmpty()) {
-            for(ItemModel itemList : itemModelList) {
+            for(Item itemList : itemModelList) {
                 UUID id = itemList.getIdItem();
                 itemList.add(linkTo(methodOn(ItemController.class).getOneItem(id)).withSelfRel());
             }
@@ -44,7 +44,7 @@ public class ItemController {
 
     @GetMapping("/item/{id}")
     public ResponseEntity<Object> getOneItem(@PathVariable(value = "id") UUID id){
-        Optional<ItemModel> itemO = itemRepository.findById(id);
+        Optional<Item> itemO = itemRepository.findById(id);
         if(itemO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found.");
         }
@@ -55,7 +55,7 @@ public class ItemController {
     @PutMapping("/item/{id}")
     public ResponseEntity<Object> updateItem(@PathVariable(value = "id") UUID id,
                                                @RequestBody @Valid ItemDto itemDto) {
-        Optional<ItemModel> itemO = itemRepository.findById(id);
+        Optional<Item> itemO = itemRepository.findById(id);
         if(itemO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found.");
         }
@@ -66,7 +66,7 @@ public class ItemController {
 
     @DeleteMapping("/item/{id}")
     public ResponseEntity<Object> deleteItem(@PathVariable(value = "id") UUID id) {
-        Optional<ItemModel> itemO = itemRepository.findById(id);
+        Optional<Item> itemO = itemRepository.findById(id);
         if(itemO.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found.");
         }
