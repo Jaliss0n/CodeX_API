@@ -1,5 +1,7 @@
 package com.codex.codex_api.models;
 
+import com.codex.codex_api.models.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +10,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -30,5 +35,30 @@ public class Item extends RepresentationModel<Item> implements Serializable {
     private Integer value;
     private Integer resaleValue;
     private String uriImgItem;
+
+    @ManyToMany
+    @JoinTable(name = "items_myavatars",
+            joinColumns = @JoinColumn(name = "item_fk"),
+            inverseJoinColumns = @JoinColumn(name = "myavatar_fk")
+    )
+    @JsonIgnore
+    private List<MyAvatar> myAvatars;
+
+
+
+    public Item(String nameItem, Integer type, String description, Integer value, Integer resaleValue, String uriImgItem){
+        this.nameItem = nameItem;
+        this.type = type;
+        this.description = description;
+        this.value = value;
+        this.resaleValue = resaleValue;
+        this.uriImgItem = uriImgItem;
+    }
+
+    public Item(String idItemAsString) {
+        this.idItem = UUID.fromString(idItemAsString);
+    }
+
+
 
 }

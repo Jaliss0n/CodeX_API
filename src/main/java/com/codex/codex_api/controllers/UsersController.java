@@ -22,8 +22,7 @@ public class UsersController {
 
     @PostMapping("/new")
     public ResponseEntity<Users> saveAdm(@RequestBody @Valid AccessUserDto accessUserDto) {
-        Users savedAdm = admService.saveAdm(accessUserDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedAdm);
+        return admService.saveAdm(accessUserDto);
     }
 
     @GetMapping("/list")

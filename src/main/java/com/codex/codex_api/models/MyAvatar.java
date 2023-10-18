@@ -1,5 +1,6 @@
 package com.codex.codex_api.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -32,6 +36,12 @@ public class MyAvatar extends RepresentationModel<MyAvatar> implements Serializa
     @JoinColumn(name = "idAvatarBase")
     private Avatar avatarBase;
 
-    //Linkar intens tbn
+    @ManyToMany(mappedBy = "myAvatars")
+    private List<Item> items;
+
+
+
+
+
 
 }

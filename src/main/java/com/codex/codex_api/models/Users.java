@@ -1,6 +1,7 @@
 package com.codex.codex_api.models;
 
 import com.codex.codex_api.models.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,6 +43,7 @@ public class Users extends RepresentationModel<Users> implements Serializable, U
     private String nameUnity;
 
     @OneToOne(mappedBy = "user")
+    @JsonIgnore // Use @JsonIgnore para evitar a serialização cíclica
     private MyAvatar myAvatar;
 
     //Constructor for register user Admin
@@ -59,6 +61,10 @@ public class Users extends RepresentationModel<Users> implements Serializable, U
         this.name = name;
         this.zipCode = zipCode;
         this.addres = address;
+    }
+
+    public Users(String idUsersAsString) {
+        this.idAccess = UUID.fromString(idUsersAsString);
     }
 
     //SpringSecurity

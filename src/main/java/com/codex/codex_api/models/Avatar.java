@@ -21,7 +21,7 @@ public class Avatar extends RepresentationModel<Avatar> implements Serializable 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID idAvatar;
 
     private String nameAvatar;
@@ -30,5 +30,9 @@ public class Avatar extends RepresentationModel<Avatar> implements Serializable 
     private Integer value;
     private Integer resaleValue;
     private String uriImgAvatar;
+
+    public Avatar(String idAvatarAsString) {
+        this.idAvatar = UUID.fromString(idAvatarAsString);
+    }
 
 }

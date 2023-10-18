@@ -20,16 +20,16 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 @RequiredArgsConstructor
-
 public class AdmService {
 
     private final UserRepository userRepository;
     private final MyAvatarRepository myAvatarRepository;
 
-    public Users saveAdm(AccessUserDto accessUserDto) {
+    public ResponseEntity<Users> saveAdm(AccessUserDto accessUserDto) {
         var accessAdmModel = new Users();
         BeanUtils.copyProperties(accessUserDto, accessAdmModel);
-        return userRepository.save(accessAdmModel);
+        Users savedUser = userRepository.save(accessAdmModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
     public List<Users> getAllAdm() {
