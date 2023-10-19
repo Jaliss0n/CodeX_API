@@ -39,9 +39,4 @@ public class MyAvatar extends RepresentationModel<MyAvatar> implements Serializa
     @ManyToMany(mappedBy = "myAvatars")
     private List<Item> items;
 
-
-
-
-
-
 }

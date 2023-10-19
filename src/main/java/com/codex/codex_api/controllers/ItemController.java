@@ -3,7 +3,9 @@ package com.codex.codex_api.controllers;
 import com.codex.codex_api.dtos.ItemDto;
 import com.codex.codex_api.models.Item;
 import com.codex.codex_api.repositories.ItemRepository;
+import com.codex.codex_api.service.ItemService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,61 +18,36 @@ import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("item")
 public class ItemController {
 
-    @Autowired
-    ItemRepository itemRepository;
+    private final ItemService itemService;
 
-    @PostMapping("/item")
+    @PostMapping("/new")
     public ResponseEntity<Item> saveItem(@RequestBody @Valid ItemDto itemDto) {
-        var itemModel = new Item();
-        BeanUtils.copyProperties(itemDto, itemModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(itemRepository.save(itemModel));
+        return itemService.saveItem(itemDto);
     }
 
-    @GetMapping("/item")
+    @GetMapping("/list")
     public ResponseEntity<List<Item>> getAllItems() {
-        List<Item> itemModelList = itemRepository.findAll();
-        if(!itemModelList.isEmpty()) {
-            for(Item itemList : itemModelList) {
-                UUID id = itemList.getIdItem();
-                itemList.add(linkTo(methodOn(ItemController.class).getOneItem(id)).withSelfRel());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(itemModelList);
+        return itemService.getAllItems();
     }
 
-    @GetMapping("/item/{id}")
+    @GetMapping("/list/{id}")
     public ResponseEntity<Object> getOneItem(@PathVariable(value = "id") UUID id){
-        Optional<Item> itemO = itemRepository.findById(id);
-        if(itemO.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found.");
-        }
-        itemO.get().add(linkTo(methodOn(ItemController.class).getAllItems()).withSelfRel());
-        return ResponseEntity.status(HttpStatus.OK).body(itemO.get());
+        return itemService.getOneItem(id);
     }
 
-    @PutMapping("/item/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateItem(@PathVariable(value = "id") UUID id,
                                                @RequestBody @Valid ItemDto itemDto) {
-        Optional<Item> itemO = itemRepository.findById(id);
-        if(itemO.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found.");
-        }
-        var itemModel = itemO.get();
-        BeanUtils.copyProperties(itemDto, itemModel);
-        return ResponseEntity.status(HttpStatus.OK).body(itemRepository.save(itemModel));
+       return itemService.updateItem(id, itemDto);
     }
 
-    @DeleteMapping("/item/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteItem(@PathVariable(value = "id") UUID id) {
-        Optional<Item> itemO = itemRepository.findById(id);
-        if(itemO.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found.");
-        }
-        itemRepository.delete(itemO.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Item deleted successfully.");
+       return itemService.deleteItem(id);
     }
 }

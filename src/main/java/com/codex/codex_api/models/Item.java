@@ -44,8 +44,6 @@ public class Item extends RepresentationModel<Item> implements Serializable {
     @JsonIgnore
     private List<MyAvatar> myAvatars;
 
-
-
     public Item(String nameItem, Integer type, String description, Integer value, Integer resaleValue, String uriImgItem){
         this.nameItem = nameItem;
         this.type = type;
@@ -58,7 +56,5 @@ public class Item extends RepresentationModel<Item> implements Serializable {
     public Item(String idItemAsString) {
         this.idItem = UUID.fromString(idItemAsString);
     }
-
-
 
 }

@@ -2,6 +2,7 @@ package com.codex.codex_api.controllers;
 
 import com.codex.codex_api.dtos.MyAvatarDto;
 import com.codex.codex_api.dtos.MyAvatarItemDTO;
+import com.codex.codex_api.dtos.MyAvatarUpdateAvatarDto;
 import com.codex.codex_api.models.MyAvatar;
 import com.codex.codex_api.service.MyAvatarService;
 import jakarta.validation.Valid;
@@ -31,8 +32,13 @@ public class MyAvatarController {
 
     @GetMapping("/my/list")
     public ResponseEntity<List<MyAvatar>> getAllMyAvatar() {
-       List<MyAvatar> myAvatars = myAvatarService.getAllMyAvatar();
-        return ResponseEntity.status(HttpStatus.OK).body(myAvatars);
+       return myAvatarService.getAllMyAvatar();
+    }
+
+    @PutMapping("/my/update/{id}")
+    public ResponseEntity<Object> updateAvatar(@PathVariable(value = "id") UUID id,
+                                               @RequestBody @Valid MyAvatarUpdateAvatarDto myAvatarUpdateAvatarDto ) {
+        return myAvatarService.updateMyAvatar(id, myAvatarUpdateAvatarDto);
     }
 
     @PutMapping("/my/add-item/{id}")
