@@ -4,7 +4,10 @@ import com.codex.codex_api.controllers.UsersController;
 import com.codex.codex_api.dtos.AccessUserDto;
 import com.codex.codex_api.exceptions.NotCreated;
 import com.codex.codex_api.exceptions.NotFound;
+import com.codex.codex_api.models.Item;
+import com.codex.codex_api.models.MyAvatar;
 import com.codex.codex_api.models.Users;
+import com.codex.codex_api.repositories.ItemRepository;
 import com.codex.codex_api.repositories.MyAvatarRepository;
 import com.codex.codex_api.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +30,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final MyAvatarRepository myAvatarRepository;
+    private final MyAvatarService myAvatarService;
 
     public ResponseEntity<Users> saveAdm(AccessUserDto accessUserDto) {
         try {
@@ -82,10 +87,16 @@ public class UserService {
         Users user = userOptional.get();
 
         if (user.getMyAvatar() != null) {
-            myAvatarRepository.delete(user.getMyAvatar());
+            MyAvatar myAvatar = user.getMyAvatar();
+
+            myAvatarService.removeItem(myAvatar.getIdMyAvatar(),null);
+
+            myAvatarRepository.save(myAvatar);
+
+            myAvatarRepository.delete(myAvatar);
         }
         userRepository.delete(user);
 
-        return ResponseEntity.ok().body("User and related MyAvatar deleted successfully.");
+        return ResponseEntity.ok().body("User and related MyAvatar items unlinked successfully.");
     }
 }

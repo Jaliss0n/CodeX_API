@@ -1,5 +1,6 @@
 package com.codex.codex_api.controllers;
 
+import com.codex.codex_api.exceptions.ItemAlreadyExists;
 import com.codex.codex_api.exceptions.NotCreated;
 import com.codex.codex_api.exceptions.NotFound;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,11 @@ public class GlobalExpetionHandler {
     @ExceptionHandler(NotCreated.class)
     public ResponseEntity<String> notCreated(NotCreated ex) {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ItemAlreadyExists.class)
+    public ResponseEntity<String> ItemAlreadyExists(ItemAlreadyExists ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
 

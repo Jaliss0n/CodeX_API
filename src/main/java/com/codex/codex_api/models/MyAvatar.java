@@ -36,7 +36,7 @@ public class MyAvatar extends RepresentationModel<MyAvatar> implements Serializa
     @JoinColumn(name = "idAvatarBase")
     private Avatar avatarBase;
 
-    @ManyToMany(mappedBy = "myAvatars")
+    @ManyToMany(mappedBy = "myAvatars", cascade = CascadeType.REMOVE)
     private List<Item> items;
 
 }

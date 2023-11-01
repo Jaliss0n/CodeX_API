@@ -1,9 +1,6 @@
 package com.codex.codex_api.controllers;
 
-import com.codex.codex_api.dtos.AuthenticationRecordDto;
-import com.codex.codex_api.dtos.LoginResponseRecordDto;
-import com.codex.codex_api.dtos.RegisterRecordDto;
-import com.codex.codex_api.dtos.RegisterUnityDTO;
+import com.codex.codex_api.dtos.*;
 import com.codex.codex_api.infra.security.TokenService;
 import com.codex.codex_api.models.Users;
 import com.codex.codex_api.repositories.UserRepository;
@@ -56,6 +53,17 @@ public class AuthenticationController {
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         Users newUser = new Users(data.login(), encryptedPassword, data.role(), data.name(), data.zipCode(), data.address());
+
+        this.repository.save(newUser);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/register/student")
+    public ResponseEntity registerStudent(@RequestBody @Valid RegisterStudentDto data) {
+        if(this.repository.findByLogin(data.login()) != null) return  ResponseEntity.badRequest().build();
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+        Users newUser = new Users(data.login(), encryptedPassword, data.role(), data.name(), data.nameUnity());
 
         this.repository.save(newUser);
         return ResponseEntity.ok().build();

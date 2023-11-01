@@ -4,6 +4,7 @@ import com.codex.codex_api.controllers.MyAvatarController;
 import com.codex.codex_api.dtos.MyAvatarDto;
 import com.codex.codex_api.dtos.MyAvatarItemDTO;
 import com.codex.codex_api.dtos.MyAvatarUpdateAvatarDto;
+import com.codex.codex_api.exceptions.ItemAlreadyExists;
 import com.codex.codex_api.exceptions.NotCreated;
 import com.codex.codex_api.exceptions.NotFound;
 import com.codex.codex_api.models.Item;
@@ -47,18 +48,21 @@ public class MyAvatarService {
         if (myAvatarOptional.isEmpty()) {
             throw new NotFound();
         } else {
-
             MyAvatar myAvatar = myAvatarOptional.get();
             Item item = itemRepository.findById(myAvatarItemDTO.idItem()).orElse(null);
 
             if (myAvatar != null && item != null) {
-                myAvatar.getItems().add(item);
-                item.getMyAvatars().add(myAvatar);
+                if (!myAvatar.getItems().contains(item)) {
+                    myAvatar.getItems().add(item);
+                    item.getMyAvatars().add(myAvatar);
 
-                myAvatarRepository.save(myAvatar);
-                itemRepository.save(item);
+                    myAvatarRepository.save(myAvatar);
+                    itemRepository.save(item);
 
-                return ResponseEntity.ok().body("Item added with successfully.");
+                    return ResponseEntity.ok().body("Item added successfully.");
+                } else {
+                    throw new ItemAlreadyExists();
+                }
             } else {
                 throw new NotCreated();
             }
@@ -67,27 +71,32 @@ public class MyAvatarService {
     }
 
     public ResponseEntity<Object> removeItem(UUID id, MyAvatarItemDTO myAvatarItemDTO) {
-
         Optional<MyAvatar> myAvatarOptional = myAvatarRepository.findById(id);
 
         if (myAvatarOptional.isEmpty()) {
             throw new NotFound();
         } else {
-
             MyAvatar myAvatar = myAvatarOptional.get();
-            Item item = itemRepository.findById(myAvatarItemDTO.idItem()).orElse(null);
 
-            if(myAvatar != null && item != null) {
-                myAvatar.getItems().remove(item);
-                item.getMyAvatars().remove(myAvatar);
+            if (myAvatarItemDTO != null) {
+                Item item = itemRepository.findById(myAvatarItemDTO.idItem()).orElse(null);
 
-                myAvatarRepository.save(myAvatar);
-                itemRepository.save(item);
-
-                return ResponseEntity.ok().body("Item removed with successfully.");
-
+                if (item != null) {
+                    myAvatar.getItems().remove(item);
+                    item.getMyAvatars().remove(myAvatar);
+                    myAvatarRepository.save(myAvatar);
+                    itemRepository.save(item);
+                    return ResponseEntity.ok().body("Item removido com sucesso.");
+                } else {
+                    throw new NotCreated();
+                }
             } else {
-                throw new NotCreated();
+                for (Item item : myAvatar.getItems()) {
+                    item.getMyAvatars().remove(myAvatar);
+                }
+                myAvatar.getItems().clear();
+                myAvatarRepository.save(myAvatar);
+                return ResponseEntity.ok().body("Todos os itens foram removidos com sucesso.");
             }
         }
     }

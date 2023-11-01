@@ -2,75 +2,68 @@ package com.codex.codex_api.controllers;
 
 import com.codex.codex_api.dtos.AvatarDto;
 import com.codex.codex_api.models.Avatar;
-import com.codex.codex_api.repositories.AvatarRepository;
+import com.codex.codex_api.service.AvatarService;
 import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("avatar")
 public class AvatarController {
 
-    @Autowired
-    AvatarRepository avatarRepository;
+    private final AvatarService avatarService;
 
-    @PostMapping("/avatar")
+    @PostMapping("/new")
     public ResponseEntity<Avatar> saveAvatar(@RequestBody @Valid AvatarDto avatarDto) {
-        var avatarModel = new Avatar();
-        BeanUtils.copyProperties(avatarDto, avatarModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(avatarRepository.save(avatarModel));
+        return avatarService.saveAvatar(avatarDto);
     }
 
-    @GetMapping("/avatar")
+    @GetMapping("/list")
     public ResponseEntity<List<Avatar>> getAllAvatar() {
-        List<Avatar> avatarModelList = avatarRepository.findAll();
-        if(!avatarModelList.isEmpty()) {
-            for(Avatar avatarList : avatarModelList) {
-                UUID id = avatarList.getIdAvatar();
-                avatarList.add(linkTo(methodOn(AvatarController.class).getOneAvatar(id)).withSelfRel());
-            }
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(avatarModelList);
+        return avatarService.getAllAvatars();
     }
 
-    @GetMapping("/avatar/{id}")
+    @GetMapping("/list/{id}")
     public ResponseEntity<Object> getOneAvatar(@PathVariable(value = "id") UUID id){
-        Optional<Avatar> avatarO = avatarRepository.findById(id);
-        if(avatarO.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found.");
-        }
-        avatarO.get().add(linkTo(methodOn(AvatarController.class).getAllAvatar()).withSelfRel());
-        return ResponseEntity.status(HttpStatus.OK).body(avatarO.get());
+        return avatarService.getOneAvatar(id);
     }
 
-    @PutMapping("/avatar/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateAvatar(@PathVariable(value = "id") UUID id,
                                                   @RequestBody @Valid AvatarDto avatarDto) {
-        Optional<Avatar> avatarO = avatarRepository.findById(id);
-        if(avatarO.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found.");
-        }
-        var avatarModel = avatarO.get();
-        BeanUtils.copyProperties(avatarDto, avatarModel);
-        return ResponseEntity.status(HttpStatus.OK).body(avatarRepository.save(avatarModel));
+        return avatarService.updateAvatar(id, avatarDto);
     }
 
-    @DeleteMapping("/avatar/{id}")
-    public ResponseEntity<Object> deleteAvatar(@PathVariable(value = "id") UUID id) {
-        Optional<Avatar> avatarO = avatarRepository.findById(id);
-        if(avatarO.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found.");
-        }
-        avatarRepository.delete(avatarO.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Avatar deleted successfully.");
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> deleteAvatar(@PathVariable(value = "id") UUID id) throws IOException {
+        return avatarService.deleteAvatar(id);
+    }
+
+    @PutMapping("/img/upload/{id}")
+    public ResponseEntity<?> uploadImageToFileSystem(@PathVariable(value = "id") UUID id, @RequestParam("image") MultipartFile file) throws IOException {
+        String uploadImage = avatarService.uploadImageAvatar(file, id);
+        return ResponseEntity.status(HttpStatus.OK).body(uploadImage);
+    }
+
+    @DeleteMapping("/img/delete/{id}")
+    public ResponseEntity<?> deleteImageAvatar(@PathVariable(value = "id") UUID id) throws IOException {
+        return ResponseEntity.status(HttpStatus.OK).body(avatarService.deleteImageAvatar(id));
+    }
+
+    @GetMapping("/img/view/{fileName}")
+    public ResponseEntity<?> downloadImageFromFileSystem(@PathVariable String fileName) throws IOException {
+        byte [] imageData = avatarService.downloadImageAvatar(fileName);
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(imageData);
     }
 }

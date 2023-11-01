@@ -37,7 +37,7 @@ public class Users extends RepresentationModel<Users> implements Serializable, U
 
     //atributes for unity only
     private String zipCode;
-    private String addres;
+    private String address;
 
     //atribute for student only
     private String nameUnity;
@@ -60,7 +60,15 @@ public class Users extends RepresentationModel<Users> implements Serializable, U
         this.role = role;
         this.name = name;
         this.zipCode = zipCode;
-        this.addres = address;
+        this.address = address;
+    }
+
+    public Users(String login, String password, UserRole role, String name, String nameUnity) {
+        this.login = login;
+        this.password = password;
+        this.role = role;
+        this.name = name;
+        this.nameUnity = nameUnity;
     }
 
     public Users(String idUsersAsString) {
