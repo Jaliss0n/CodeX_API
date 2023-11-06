@@ -29,6 +29,7 @@ public class UsersController {
     public ResponseEntity<List<Users>> getAllAccessAdm(){
 
         return userService.getAllAdm();
+
     }
 
     @GetMapping("/list/{id}")

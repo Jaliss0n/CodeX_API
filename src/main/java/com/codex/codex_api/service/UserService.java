@@ -4,6 +4,7 @@ import com.codex.codex_api.controllers.UsersController;
 import com.codex.codex_api.dtos.AccessUserDto;
 import com.codex.codex_api.exceptions.NotCreated;
 import com.codex.codex_api.exceptions.NotFound;
+import com.codex.codex_api.external.api.MoodleData;
 import com.codex.codex_api.models.Item;
 import com.codex.codex_api.models.MyAvatar;
 import com.codex.codex_api.models.Users;
@@ -15,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final MyAvatarRepository myAvatarRepository;
     private final MyAvatarService myAvatarService;
+    private final RestTemplate restTemplate;
 
     public ResponseEntity<Users> saveAdm(AccessUserDto accessUserDto) {
         try {
@@ -98,5 +101,19 @@ public class UserService {
         userRepository.delete(user);
 
         return ResponseEntity.ok().body("User and related MyAvatar items unlinked successfully.");
+    }
+
+    public MoodleData getStudentAva(String naveganteId) {
+        String moodleUrl = "https://ava.code8734.com.br/webservice/rest/server.php?wstoken=968509e186e788a325ba32a0e680f5c3&wsfunction=core_user_get_users&moodlewsrestformat=json&criteria[0][key]=username&criteria[0][value]=" + naveganteId;
+
+        ResponseEntity<MoodleData> response = restTemplate.getForEntity(moodleUrl, MoodleData.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            MoodleData moodleData = response.getBody();
+            return moodleData;
+        } else {
+            System.err.println("Erro na chamada à API: " + response.getStatusCode());
+            return null;
+        }
     }
 }
