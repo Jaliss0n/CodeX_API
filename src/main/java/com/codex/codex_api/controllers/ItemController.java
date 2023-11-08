@@ -1,6 +1,7 @@
 package com.codex.codex_api.controllers;
 
 import com.codex.codex_api.dtos.ItemDto;
+import com.codex.codex_api.dtos.MyAvatarItemDTO;
 import com.codex.codex_api.models.Item;
 import com.codex.codex_api.repositories.ItemRepository;
 import com.codex.codex_api.service.ItemService;
@@ -69,6 +70,18 @@ public class ItemController {
     public ResponseEntity<?> downloadImageFromFileSystem(@PathVariable String fileName) throws IOException {
         byte [] imageData = itemService.downloadImageItem(fileName);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(imageData);
+    }
+
+    @PutMapping("/buy-item/{id}")
+    public ResponseEntity<Object> buyItem(@PathVariable(value = "id") UUID id,
+                                          @RequestBody @Valid MyAvatarItemDTO myAvatarItemDTO) {
+        return itemService.buyitem(id, myAvatarItemDTO);
+    }
+
+    @DeleteMapping("/sell-item/{id}")
+    public ResponseEntity<Object> sellItem(@PathVariable(value = "id") UUID id,
+                                           @RequestBody @Valid MyAvatarItemDTO myAvatarItemDTO) {
+        return itemService.sellItem(id, myAvatarItemDTO);
     }
 
 }

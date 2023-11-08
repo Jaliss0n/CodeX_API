@@ -1,6 +1,8 @@
 package com.codex.codex_api.controllers;
 
 import com.codex.codex_api.dtos.AccessUserDto;
+import com.codex.codex_api.dtos.MyAvatarItemDTO;
+import com.codex.codex_api.external.api.CodebankApi;
 import com.codex.codex_api.models.Users;
 import com.codex.codex_api.service.UserService;
 import jakarta.validation.Valid;
@@ -47,5 +49,7 @@ public class UsersController {
     public ResponseEntity<Object> deleteAccessAdm(@PathVariable(value = "id") UUID id) {
         return userService.deleteUser(id);
     }
+
+
 
 }

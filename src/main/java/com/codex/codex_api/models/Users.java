@@ -41,10 +41,15 @@ public class Users extends RepresentationModel<Users> implements Serializable, U
 
     //atribute for student only
     private String nameUnity;
+    private int idMoodle;
 
     @OneToOne(mappedBy = "user")
     @JsonIgnore // Use @JsonIgnore para evitar a serialização cíclica
     private MyAvatar myAvatar;
+
+    @ManyToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+    private List<Item> items;
+
 
     //Constructor for register user Admin
     public Users(String login, String password, UserRole role){
@@ -63,12 +68,13 @@ public class Users extends RepresentationModel<Users> implements Serializable, U
         this.address = address;
     }
 
-    public Users(String login, String password, UserRole role, String name, String nameUnity) {
+    public Users(String login, String password, UserRole role, String name, String nameUnity, int idMoodle) {
         this.login = login;
         this.password = password;
         this.role = role;
         this.name = name;
         this.nameUnity = nameUnity;
+        this.idMoodle = idMoodle;
     }
 
     public Users(String idUsersAsString) {

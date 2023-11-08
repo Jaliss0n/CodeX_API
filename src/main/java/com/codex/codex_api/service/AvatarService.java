@@ -8,6 +8,7 @@ import com.codex.codex_api.models.Avatar;
 import com.codex.codex_api.repositories.AvatarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class AvatarService {
 
     private final AvatarRepository avatarRepository;
-    private final String folderPatch= "D:\\Jalisson Santos\\Documents\\Projedos\\codex_api\\src\\main\\java\\com\\codex\\codex_api\\images\\avatar\\";
+
+    @Value("${api.folder.avatar}")
+    private String folderPatch;
 
     public ResponseEntity<Avatar> saveAvatar(AvatarDto avatarDto) {
         try {

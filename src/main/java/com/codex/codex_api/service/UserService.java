@@ -2,8 +2,9 @@ package com.codex.codex_api.service;
 
 import com.codex.codex_api.controllers.UsersController;
 import com.codex.codex_api.dtos.AccessUserDto;
-import com.codex.codex_api.exceptions.NotCreated;
-import com.codex.codex_api.exceptions.NotFound;
+import com.codex.codex_api.dtos.MyAvatarItemDTO;
+import com.codex.codex_api.exceptions.*;
+import com.codex.codex_api.external.api.CodebankApi;
 import com.codex.codex_api.external.api.MoodleData;
 import com.codex.codex_api.models.Item;
 import com.codex.codex_api.models.MyAvatar;
@@ -13,15 +14,13 @@ import com.codex.codex_api.repositories.MyAvatarRepository;
 import com.codex.codex_api.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -34,6 +33,10 @@ public class UserService {
     private final MyAvatarRepository myAvatarRepository;
     private final MyAvatarService myAvatarService;
     private final RestTemplate restTemplate;
+    private final ItemRepository itemRepository;
+
+    @Value("${api.moodle.token}")
+    private String tokenMoodle;
 
     public ResponseEntity<Users> saveAdm(AccessUserDto accessUserDto) {
         try {
@@ -104,7 +107,7 @@ public class UserService {
     }
 
     public MoodleData getStudentAva(String naveganteId) {
-        String moodleUrl = "https://ava.code8734.com.br/webservice/rest/server.php?wstoken=968509e186e788a325ba32a0e680f5c3&wsfunction=core_user_get_users&moodlewsrestformat=json&criteria[0][key]=username&criteria[0][value]=" + naveganteId;
+        String moodleUrl = "https://ava.code8734.com.br/webservice/rest/server.php?wstoken=" + tokenMoodle + "&wsfunction=core_user_get_users&moodlewsrestformat=json&criteria[0][key]=username&criteria[0][value]=" + naveganteId;
 
         ResponseEntity<MoodleData> response = restTemplate.getForEntity(moodleUrl, MoodleData.class);
 
@@ -112,8 +115,8 @@ public class UserService {
             MoodleData moodleData = response.getBody();
             return moodleData;
         } else {
-            System.err.println("Erro na chamada à API: " + response.getStatusCode());
-            return null;
+            throw new ErrorApi();
         }
     }
+
 }

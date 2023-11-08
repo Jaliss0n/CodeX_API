@@ -44,6 +44,14 @@ public class Item extends RepresentationModel<Item> implements Serializable {
     @JsonIgnore
     private List<MyAvatar> myAvatars;
 
+    @ManyToMany
+    @JoinTable(name = "items_users",
+            joinColumns = @JoinColumn(name = "item_fk"),
+            inverseJoinColumns = @JoinColumn(name = "users_fk")
+    )
+    @JsonIgnore
+    private List<Users> users;
+
     public Item(String nameItem, Integer type, String description, Integer value, Integer resaleValue, String uriImgItem){
         this.nameItem = nameItem;
         this.type = type;

@@ -1,8 +1,6 @@
 package com.codex.codex_api.controllers;
 
-import com.codex.codex_api.exceptions.ItemAlreadyExists;
-import com.codex.codex_api.exceptions.NotCreated;
-import com.codex.codex_api.exceptions.NotFound;
+import com.codex.codex_api.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,5 +24,14 @@ public class GlobalExpetionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
+    @ExceptionHandler(NoEnoughCB.class)
+    public ResponseEntity<String> DontHaveCB(NoEnoughCB ex) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ErrorApi.class)
+    public ResponseEntity<String> DontHaveCB(ErrorApi ex) {
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(ex.getMessage());
+    }
 
 }
