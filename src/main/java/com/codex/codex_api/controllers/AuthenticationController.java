@@ -33,4 +33,10 @@ public class AuthenticationController {
     public ResponseEntity registerStudent(@RequestBody @Valid RegisterStudentDto data) {
         return authenticationService.registerStudent(data);
     }
+
+    @PutMapping("/register/student/reset")
+    public ResponseEntity resetStudent(@RequestBody @Valid ResetPasswordStudent resetPasswordStudent) {
+        return authenticationService.resetStudent(resetPasswordStudent);
+    }
+
 }

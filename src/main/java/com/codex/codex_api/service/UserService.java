@@ -1,8 +1,7 @@
 package com.codex.codex_api.service;
 
 import com.codex.codex_api.controllers.UsersController;
-import com.codex.codex_api.dtos.AccessUserDto;
-import com.codex.codex_api.dtos.MyAvatarItemDTO;
+import com.codex.codex_api.dtos.*;
 import com.codex.codex_api.exceptions.*;
 import com.codex.codex_api.external.api.CodebankApi;
 import com.codex.codex_api.external.api.MoodleData;
@@ -17,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.GsonBuilderUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -69,8 +69,18 @@ public class UserService {
         if (accessAdmO.isEmpty()) {
             throw new NotFound();
         }
+
         accessAdmO.get().add(linkTo(methodOn(UsersController.class).getAllAccessAdm()).withSelfRel());
-        return ResponseEntity.status(HttpStatus.OK).body(accessAdmO.get());
+
+        var userAttributes = new UserAttributes(
+                accessAdmO.get().getIdAccess(),
+                accessAdmO.get().getIdMoodle(),
+                accessAdmO.get().getRole(),
+                accessAdmO.get().getName(),
+                accessAdmO.get().getItems()
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(userAttributes);
     }
 
     public ResponseEntity<Object> updateUser(UUID id, AccessUserDto accessUserDto) {
@@ -80,9 +90,12 @@ public class UserService {
         } else {
             var userModel = user0.get();
             BeanUtils.copyProperties(accessUserDto, userModel);
+
             return ResponseEntity.status(HttpStatus.OK).body(userRepository.save(userModel));
         }
     }
+
+
 
     public ResponseEntity<Object> deleteUser(UUID id) {
         Optional<Users> userOptional = userRepository.findById(id);
@@ -106,16 +119,21 @@ public class UserService {
         return ResponseEntity.ok().body("User and related MyAvatar items unlinked successfully.");
     }
 
-    public MoodleData getStudentAva(String naveganteId) {
+    public MoodleDataWithStatusAttributes getStudentAva(String naveganteId) {
         String moodleUrl = "https://ava.code8734.com.br/webservice/rest/server.php?wstoken=" + tokenMoodle + "&wsfunction=core_user_get_users&moodlewsrestformat=json&criteria[0][key]=username&criteria[0][value]=" + naveganteId;
 
         ResponseEntity<MoodleData> response = restTemplate.getForEntity(moodleUrl, MoodleData.class);
+        MoodleData moodleData = response.getBody();
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            MoodleData moodleData = response.getBody();
-            return moodleData;
+        if (!moodleData.getUsers().isEmpty()) {
+
+            UserDetails findAlredyUser = userRepository.findByLogin(naveganteId);
+
+            boolean alreadyCadastred = findAlredyUser != null;
+
+            return new MoodleDataWithStatusAttributes(moodleData, alreadyCadastred);
         } else {
-            throw new ErrorApi();
+            throw new NotFound();
         }
     }
 
